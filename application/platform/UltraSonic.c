@@ -320,7 +320,7 @@ void UltraSonicStart(void)
 	UltraWriteBit(1);
 #endif
     
-    delay_us(370);  
+    delay_us(400);  
    
     DISABLE_INTERRUPTS();
     ultra_sonic_data->interval_time.cnt = 0;
@@ -334,7 +334,7 @@ void UltraSonicStart(void)
 }
 
 
-#define ULTRASONIC_MEASURE_TIME         13/SYSTICK_PERIOD //unit: ms
+#define ULTRASONIC_MEASURE_TIME         14/SYSTICK_PERIOD //unit: ms
 #define ULTRASONIC_DATA_EXIST_TIME      500/SYSTICK_PERIOD//unit: ms
 void UltraSonicDataTick(void)
 {

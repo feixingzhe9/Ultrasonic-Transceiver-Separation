@@ -13,8 +13,6 @@
 #define Application_REVISION "v0.1"
 void SysLed(void);
 void UltraSonicStartTick(void);
-//extern ultra_sonic_ee_data_ut * ultra_sonic_ee_data;
-//extern ultra_sonic_threshold_t * ultra_sonic_threshold;
 
 int main( void )
 {
@@ -33,20 +31,19 @@ int main( void )
   UltraSonicInit();
   delay_ms(10);
   
-  //can test init//
   CanLongBufInit();
  
   for(;;)
   { 
-    //can_protocol_period(); 
-    //protocol_period();
+    can_protocol_period(); 
+    protocol_period();
     UltraSonicStartTick();
     UltraSonicDataTick();
     SysLed();
   }
 }
 
-#define ULTRASONIC_SEND_TIME   200/SYSTICK_PERIOD
+#define ULTRASONIC_SEND_TIME   100/SYSTICK_PERIOD
 void UltraSonicStartTick(void) 
 {
     static uint32_t start_time_1 = 0;
@@ -81,8 +78,6 @@ void SysLed(void)
     pin_config.gpio_speed = GPIO_SPEED_MEDIUM;
     pin_config.gpio_mode = GPIO_MODE_OUTPUT_PP;// GPIO_MODE_AF_PP;// 
     pin_config.gpio_pull = GPIO_PULLUP;
-
-    
     
     //  Initialise system led
     MicoGpioInitialize( (mico_gpio_t)MICO_GPIO_SYS_LED, &pin_config );
