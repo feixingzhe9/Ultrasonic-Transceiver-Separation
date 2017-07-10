@@ -855,7 +855,7 @@ void UltraSonicPrgramEE(void)
     UltraSonicLog("Ultrasonic Program EEPROM ! \r\n");
 }
 
-
+extern void CanTX(mico_can_t can_type, uint32_t CANx_ID,uint8_t* pdata,uint16_t len);
 void ShowTestLog(void)
 {
     uint8_t i = 0;
@@ -865,18 +865,14 @@ void ShowTestLog(void)
         //for(i = 0; i < ultra_sonic_data->interval_time.cnt; i++)
         {
             ultra_sonic_data->compute_ditance[i] = ultra_sonic_data->interval_time.time[i] * 17 /1000;
+#if 0
             UltraSonicLog("%d - distance : %d cm\r\n",i + 1,ultra_sonic_data->compute_ditance[i]);
+#else
+           CanTX( MICO_CAN1, 0x12345678, (uint8_t *)&ultra_sonic_data->compute_ditance[i], sizeof(ultra_sonic_data->compute_ditance[i]) ); 
+#endif
         }
     }
-    
-
-#if 0   
-    if(ultrasonic_frq_calibration->start_flag == 1)
-    {
-        tmp = 1000000/ultrasonic_frq_calibration->interval_time;
-        UltraSonicLog("frq : %d\r\n", tmp*2*12);
-    }
-#endif    
+      
 }
 
 void UltraSonicSetFrqToDest(void)

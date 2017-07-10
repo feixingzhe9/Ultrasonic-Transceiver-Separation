@@ -78,9 +78,9 @@ extern WEAK void bootloader_start(void);
 const platform_gpio_t platform_gpio_pins[] =
 {
 
-    [MICO_GPIO_ULTRA_DATA]        = { GPIOC,  4 },//{ GPIOB,  13 },
+    [MICO_GPIO_ULTRA_DATA]        = { GPIOB,  13 },//{ GPIOC,  4 },//
     [MICO_GPIO_24_V_EN]           = { GPIOA,  0 },
-    [MICO_GPIO_SYS_LED]           = { GPIOB,  8 },//{ GPIOB,  3 },
+    [MICO_GPIO_SYS_LED]           = { GPIOB,  3 },//{ GPIOB,  8 },//
     [MICO_GPIO_KEY_S0]            = { GPIOA,  1 },
     [MICO_GPIO_KEY_S1]            = { GPIOA,  2 },
     [MICO_GPIO_KEY_S2]            = { GPIOA,  3 },

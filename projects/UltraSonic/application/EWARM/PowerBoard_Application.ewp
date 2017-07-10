@@ -99,7 +99,7 @@
         </option>
         <option>
           <name>OGChipSelectEditMenu</name>
-          <state>STM32F103xB	ST STM32F103xB</state>
+          <state>STM32F103x8	ST STM32F103x8</state>
         </option>
         <option>
           <name>GenLowLevelInterface</name>
@@ -174,7 +174,7 @@
           <state>USE_STDPERIPH_DRIVER</state>
           <state>xSIZE_OPTIMIZE</state>
           <state>NO_MICO_RTOS</state>
-          <state>xMICO_DISABLE_WATCHDOG</state>
+          <state>MICO_DISABLE_WATCHDOG</state>
           <state>DEBUG=1</state>
           <state>NO_BLOCK_MENU</state>
         </option>
