@@ -61,23 +61,36 @@ CALLBACK_T FuncId_table[] = {
 	{0x00,NULL},
 };
 
-#if 0
+#if 1
 extern uint8_t GetKeyValue(mico_gpio_t gpio);
 uint32_t my_id;
 uint8_t GetCanMacId(void)
 {
-    uint8_t key_value = 0;
-
-    key_value |=  GetKeyValue(MICO_GPIO_KEY_S0);
-    key_value |=  GetKeyValue(MICO_GPIO_KEY_S1)<<1;
-    key_value |=  GetKeyValue(MICO_GPIO_KEY_S2)<<2;
-    key_value |=  GetKeyValue(MICO_GPIO_KEY_S3)<<3;
-    key_value |=  GetKeyValue(MICO_GPIO_KEY_S4)<<4;
-    key_value |=  GetKeyValue(MICO_GPIO_KEY_S5)<<5;
-    key_value = key_value;
-    if((key_value != 0) && (key_value < 0x0f))
+  
+#define DEBOUNCE_TIME       100/SYSTICK_PERIOD
+    uint8_t new_key_value = 0;
+    uint8_t old_key_value = 0;
+    static uint32_t start_time = 0;
+    start_time = os_get_time();
+    while(os_get_time() - start_time >= 50)
     {
-        return key_value + 0x60;
+        old_key_value = new_key_value;
+        new_key_value |=  GetKeyValue(MICO_GPIO_KEY_S0);
+        new_key_value |=  GetKeyValue(MICO_GPIO_KEY_S1)<<1;
+        new_key_value |=  GetKeyValue(MICO_GPIO_KEY_S2)<<2;
+        new_key_value |=  GetKeyValue(MICO_GPIO_KEY_S3)<<3;
+        new_key_value |=  GetKeyValue(MICO_GPIO_KEY_S4)<<4;
+        new_key_value |=  GetKeyValue(MICO_GPIO_KEY_S5)<<5;
+        if(new_key_value != old_key_value)
+        {
+            start_time = os_get_time();
+        }     
+    }
+
+    
+    if((new_key_value != 0) && (new_key_value < 0x0f))
+    {
+        return new_key_value + 0x60;
     }
     CanProtocolLog("Ultrasonic CAN MAC ID out of range ! ! ! \r\n");
     return 0x60;
@@ -435,15 +448,10 @@ CAN_TXDATA_STRUCT FirmwareUpgrade(uint32_t ID,uint8_t* pdata,uint32_t len)
 
 
 //////  source id define  //////
-#define CAN_SOURCE_ID_READ_VERSION      0x01
-#define CAN_SOURCE_ID_MODULE_STATE      0x81
-#define CAN_SOURCE_ID_ERROR_STATE       0x82
-#define CAN_SOURCE_ID_READ_ADC_DATA     0x83
-#define CAN_SOURCE_ID_READ_RK_STATE     0x84
-#define CAN_SOURCE_ID_PWM_LED           0x85        
+#define CAN_SOURCE_ID_READ_VERSION      0x01    
 
+#define CAN_SOURCE_ID_READ_MEASURE_DATA     0x80
 
-#define CAN_READ_DATA               0x80
 
 
 
@@ -456,6 +464,8 @@ uint16_t CmdProcessing(CAN_ID_UNION *id, const uint8_t *data_in, const uint16_t 
     id->CanID_Struct.SrcMACID = CAN_SUB_PB_ID;
     id->CanID_Struct.res = 0;
     //id->CanID_Struct.FUNC_ID = 
+    
+     uint16_t tmp;
     switch(id->CanID_Struct.FUNC_ID)
     {
         case CAN_FUN_ID_RESET:
@@ -486,19 +496,11 @@ uint16_t CmdProcessing(CAN_ID_UNION *id, const uint8_t *data_in, const uint16_t 
                     }
                     return CMD_NOT_FOUND;
                     break;
-                case CAN_READ_DATA:
-                
-                    break;
-                case CAN_SOURCE_ID_MODULE_STATE:
-                
-                case CAN_SOURCE_ID_ERROR_STATE: 
+                case CAN_SOURCE_ID_READ_MEASURE_DATA:
                    
-                    
-                case CAN_SOURCE_ID_READ_ADC_DATA:  
-                    
-                case CAN_SOURCE_ID_READ_RK_STATE:
-                  
-                case CAN_SOURCE_ID_PWM_LED:
+                    tmp =  UltraSonicGetMeasureData();
+                    memcpy(&data_out[0], (uint8_t *)&tmp,sizeof(tmp));
+                    return  sizeof(tmp);
                     break;
                 default :
                     break;
