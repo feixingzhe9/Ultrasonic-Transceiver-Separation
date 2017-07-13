@@ -320,7 +320,7 @@ void UltraSonicStart(void)
 	UltraWriteBit(1);
 #endif
     
-    delay_us(400);  
+    delay_us(380);  
    
     DISABLE_INTERRUPTS();
     ultra_sonic_data->interval_time.cnt = 0;
@@ -865,7 +865,7 @@ void ShowTestLog(void)
         //for(i = 0; i < ultra_sonic_data->interval_time.cnt; i++)
         {
             ultra_sonic_data->compute_ditance[i] = ultra_sonic_data->interval_time.time[i] * 17 /1000;
-#if 0
+#if 1
             UltraSonicLog("%d - distance : %d cm\r\n",i + 1,ultra_sonic_data->compute_ditance[i]);
 #else
            CanTX( MICO_CAN1, 0x12345678, (uint8_t *)&ultra_sonic_data->compute_ditance[i], sizeof(ultra_sonic_data->compute_ditance[i]) ); 

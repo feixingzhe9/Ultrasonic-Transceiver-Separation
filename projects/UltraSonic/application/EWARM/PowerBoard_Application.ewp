@@ -3871,6 +3871,9 @@
       </file>
       <file>
         <name>$PROJ_DIR$\..\..\..\..\application\platform\protocol.h</name>
+        <excluded>
+          <configuration>Debug</configuration>
+        </excluded>
       </file>
       <file>
         <name>$PROJ_DIR$\..\..\..\..\application\platform\serial_uart.c</name>
@@ -3880,6 +3883,9 @@
       </file>
       <file>
         <name>$PROJ_DIR$\..\..\..\..\application\platform\uart_protocol.c</name>
+        <excluded>
+          <configuration>Debug</configuration>
+        </excluded>
       </file>
       <file>
         <name>$PROJ_DIR$\..\..\..\..\application\platform\UltraSonic.c</name>

@@ -24,7 +24,6 @@ int main( void )
 
   bsp_Init();
   Platform_Init();
-  Protocol_Init();
   MicoCanInitialize( MICO_CAN1 );
   
   delay_ms(10);
@@ -36,7 +35,6 @@ int main( void )
   for(;;)
   { 
     can_protocol_period(); 
-    //protocol_period();
     UltraSonicStartTick();
     UltraSonicDataTick();
     SysLed();

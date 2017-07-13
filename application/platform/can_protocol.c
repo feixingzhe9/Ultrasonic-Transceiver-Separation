@@ -445,17 +445,7 @@ CAN_TXDATA_STRUCT FirmwareUpgrade(uint32_t ID,uint8_t* pdata,uint32_t len)
 
 #define CAN_READ_DATA               0x80
 
-void UploadAdcData(void)
-{
-    CAN_ID_UNION id;
-    id.CanID_Struct.ACK = 1;
-    id.CanID_Struct.DestMACID = 0;////
-    id.CanID_Struct.FUNC_ID = CAN_FUN_ID_TRIGGER;
-    id.CanID_Struct.SourceID = CAN_SOURCE_ID_READ_ADC_DATA;
-    id.CanID_Struct.SrcMACID = CAN_SUB_PB_ID;////
 
-    CanTX( MICO_CAN1, id.CANx_ID, (uint8_t *)voltageConvert, sizeof(voltageData_t) );
-}
 
 #define CMD_NOT_FOUND   0
 uint16_t CmdProcessing(CAN_ID_UNION *id, const uint8_t *data_in, const uint16_t data_in_len, uint8_t *data_out)
