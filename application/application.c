@@ -35,13 +35,13 @@ int main( void )
   for(;;)
   { 
     can_protocol_period(); 
-    UltraSonicStartTick();
+    //UltraSonicStartTick();
     UltraSonicDataTick();
     SysLed();
   }
 }
 
-#define ULTRASONIC_SEND_TIME   200/SYSTICK_PERIOD
+#define ULTRASONIC_SEND_TIME   1000/SYSTICK_PERIOD
 void UltraSonicStartTick(void) 
 {
     static uint32_t start_time_1 = 0;

@@ -8,7 +8,7 @@
 
 //////////define the time init value//////////
 ///   uint:  us  ////
-#define F_DRV			    52000
+#define F_DRV			    58000
 #if 1
 #define T_DEB               0
 #define T_SND 				(uint32_t)(6*1000*1000/F_DRV)  //  
@@ -31,7 +31,7 @@
 
 
 //////////define the destination frequency and allowed errors
-#define DEST_FRQ                    52000
+#define DEST_FRQ                    58000
 #define DEST_FRQ_ERROR              250
 
 #define MIN_FRQ                     30000
@@ -52,7 +52,7 @@
 #define T_1_HIGH_MIN
 
 
-#define NO_OBJ_DETECTED     0
+#define NO_OBJ_DETECTED     0x0000
 
 typedef enum
 {

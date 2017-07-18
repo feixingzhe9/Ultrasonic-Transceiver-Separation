@@ -19,16 +19,13 @@
 #define CanProtocolLog(format, ...)  custom_log("can protocol", format, ##__VA_ARGS__)
 
 __IO uint32_t flag = 0xff;
-//CanTxMsgTypeDef TxMessage;
+
 CanRxMsgTypeDef RxMessage;
 CanTxMsgTypeDef TxMessage;
 
 extern platform_can_driver_t  platform_can_drivers[];
 uint8_t CanTxdataBuff[CAN_LONG_FRAME_LENTH_MAX] = {0};
-#if 0
-uint8_t CanUpdataBuff[64];
-uint8_t CanRxdataBuff[64];
-#endif
+
 
 
 uint8_t swVersion[] = SW_VERSION;
@@ -64,23 +61,40 @@ CALLBACK_T FuncId_table[] = {
 #if 1
 extern uint8_t GetKeyValue(mico_gpio_t gpio);
 uint32_t my_id;
-uint8_t GetCanMacId(void)
+uint8_t GetCanSrcId(void)
 {
   
 #define DEBOUNCE_TIME       100/SYSTICK_PERIOD
     uint8_t new_key_value = 0;
     uint8_t old_key_value = 0;
+    uint8_t tmp_1 = 0;
+    uint8_t tmp_2 = 0;
+    uint8_t tmp_3 = 0;
+    uint8_t tmp_4 = 0;
+    uint8_t tmp_5 = 0;
+    uint8_t tmp_6 = 0;
+    
     static uint32_t start_time = 0;
     start_time = os_get_time();
-    while(os_get_time() - start_time >= 50)
+    while(os_get_time() - start_time <= DEBOUNCE_TIME)
     {
         old_key_value = new_key_value;
+#if 1       
+        tmp_1 = GetKeyValue(MICO_GPIO_KEY_S0);
+        tmp_2 = GetKeyValue(MICO_GPIO_KEY_S1);
+        tmp_3 = GetKeyValue(MICO_GPIO_KEY_S2); 
+        tmp_4 = GetKeyValue(MICO_GPIO_KEY_S3);
+        tmp_5 = GetKeyValue(MICO_GPIO_KEY_S4);
+        tmp_6 = GetKeyValue(MICO_GPIO_KEY_S5);
+        new_key_value = tmp_1 | (tmp_2 << 1) | (tmp_3 << 2) | (tmp_4 << 3) | (tmp_5 << 4) | (tmp_6 << 5);        
+#else
         new_key_value |=  GetKeyValue(MICO_GPIO_KEY_S0);
         new_key_value |=  GetKeyValue(MICO_GPIO_KEY_S1)<<1;
         new_key_value |=  GetKeyValue(MICO_GPIO_KEY_S2)<<2;
         new_key_value |=  GetKeyValue(MICO_GPIO_KEY_S3)<<3;
         new_key_value |=  GetKeyValue(MICO_GPIO_KEY_S4)<<4;
         new_key_value |=  GetKeyValue(MICO_GPIO_KEY_S5)<<5;
+#endif   
         if(new_key_value != old_key_value)
         {
             start_time = os_get_time();
@@ -88,9 +102,9 @@ uint8_t GetCanMacId(void)
     }
 
     
-    if((new_key_value != 0) && (new_key_value < 0x0f))
+    if((new_key_value != 0) && (new_key_value <= 0x0f))
     {
-        return new_key_value + 0x60;
+        return new_key_value + ULTRASONIC_SRC_ID_BASE;
     }
     CanProtocolLog("Ultrasonic CAN MAC ID out of range ! ! ! \r\n");
     return 0x60;
@@ -456,16 +470,17 @@ CAN_TXDATA_STRUCT FirmwareUpgrade(uint32_t ID,uint8_t* pdata,uint32_t len)
 
 
 #define CMD_NOT_FOUND   0
+extern uint32_t ultrasonic_src_id;
 uint16_t CmdProcessing(CAN_ID_UNION *id, const uint8_t *data_in, const uint16_t data_in_len, uint8_t *data_out)
 {
     //uint8_t data_out_len;
     id->CanID_Struct.ACK = 1;   
     id->CanID_Struct.DestMACID = id->CanID_Struct.SrcMACID;
-    id->CanID_Struct.SrcMACID = CAN_SUB_PB_ID;
+    id->CanID_Struct.SrcMACID = ultrasonic_src_id;
     id->CanID_Struct.res = 0;
     //id->CanID_Struct.FUNC_ID = 
     
-     uint16_t tmp;
+     
     switch(id->CanID_Struct.FUNC_ID)
     {
         case CAN_FUN_ID_RESET:
@@ -497,10 +512,17 @@ uint16_t CmdProcessing(CAN_ID_UNION *id, const uint8_t *data_in, const uint16_t 
                     return CMD_NOT_FOUND;
                     break;
                 case CAN_SOURCE_ID_READ_MEASURE_DATA:
-                   
-                    tmp =  UltraSonicGetMeasureData();
-                    memcpy(&data_out[0], (uint8_t *)&tmp,sizeof(tmp));
-                    return  sizeof(tmp);
+#if 0
+                    {
+                        uint16_t tmp;
+                        tmp =  UltraSonicGetMeasureData();
+                        memcpy(&data_out[0], (uint8_t *)&tmp,sizeof(tmp));
+                        return  sizeof(tmp);
+                    }                   
+#else
+                    UltraSonicStart();
+                    return 0;
+#endif                   
                     break;
                 default :
                     break;
@@ -591,7 +613,10 @@ void can_protocol_period( void )
                     tx_len = CmdProcessing(&id, rx_buf.CanData_Struct.Data, rx_data_len - 1, CanTxdataBuff );
                     //process the data here//
                     
-                    CanTX( MICO_CAN1, id.CANx_ID, CanTxdataBuff, tx_len );
+                    if(tx_len > 0)
+                    {
+                        CanTX( MICO_CAN1, id.CANx_ID, CanTxdataBuff, tx_len );
+                    }                   
                     //CanTX( MICO_CAN1, id.CANx_ID, test_data, sizeof(test_data) );
                     //CanTX( MICO_CAN1, id.CANx_ID, rx_buf.CanData, rx_data_len );
             }
